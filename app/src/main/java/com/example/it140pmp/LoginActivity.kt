@@ -6,23 +6,25 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.it140pmp.ui.theme.IT140PMPTheme // Import your theme
+import com.example.it140pmp.ui.theme.IT140PMPTheme
 
-import androidx.compose.runtime.saveable.rememberSaveable
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
@@ -34,7 +36,7 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            IT140PMPTheme { // Apply the theme here
+            IT140PMPTheme {
                 LoginScreen()
             }
         }
@@ -44,11 +46,10 @@ class LoginActivity : ComponentActivity() {
     @Composable
     fun LoginScreen() {
         val context = LocalContext.current
-        var username by rememberSaveable { mutableStateOf("") } // Use rememberSaveable for state persistence
-        var password by rememberSaveable { mutableStateOf("") } // Use rememberSaveable for state persistence
+        var username by rememberSaveable { mutableStateOf("") }
+        var password by rememberSaveable { mutableStateOf("") }
         val scope = rememberCoroutineScope()
 
-        // Error states for username and password
         var usernameError: String? by remember { mutableStateOf(null) }
         var passwordError: String? by remember { mutableStateOf(null) }
 
@@ -70,25 +71,14 @@ class LoginActivity : ComponentActivity() {
             ) {
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Text(
-                    text = "MaluPET",
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 48.sp,
-                        letterSpacing = 2.sp
-                    ),
-                    color = Color(0xFF004D40),
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-
-                Text(
-                    text = "Welcome Back!",
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 32.sp
-                    ),
-                    color = Color(0xFF00796B),
-                    modifier = Modifier.padding(bottom = 8.dp)
+                //logo
+                Image(
+                    painter = painterResource(id = R.drawable.pet5),
+                    contentDescription = "App Logo",
+                    modifier = Modifier
+                        .height(150.dp)
+                        .padding(bottom = 16.dp)
+                        .width(150.dp)
                 )
 
                 Text(
@@ -97,21 +87,28 @@ class LoginActivity : ComponentActivity() {
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp
                     ),
-                    color = Color(0xFF424242),
+                    color = Color(0xFF00796B),
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                // Reusing MyInputText for consistency, but adapting it for login fields
+                Text(
+                    text = "Good to see you again!",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = Color(0xFF616161)
+                    ),
+                    modifier = Modifier.padding(bottom = 36.dp)
+                )
+
                 LoginInputFields(
                     username = username,
                     onUsernameChange = {
                         username = it
-                        usernameError = null // Clear error on change
+                        usernameError = null
                     },
                     password = password,
                     onPasswordChange = {
                         password = it
-                        passwordError = null // Clear error on change
+                        passwordError = null
                     },
                     usernameError = usernameError,
                     passwordError = passwordError
@@ -119,10 +116,8 @@ class LoginActivity : ComponentActivity() {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Login button, using the AppButton composable
                 AppButton(
                     onClick = {
-                        // Basic validation for empty fields
                         if (username.isBlank()) {
                             usernameError = "Username cannot be empty."
                         }
@@ -156,12 +151,12 @@ class LoginActivity : ComponentActivity() {
                         color = Color.DarkGray
                     )
                     TextButton(onClick = {
-                        context.startActivity(Intent(context, MainActivity::class.java))
+                        context.startActivity(Intent(context, RegisterActivity::class.java))
                     }) {
                         Text(
                             text = "Sign up",
                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                            color = Color(0xFF00796B) // Use your primary teal color for the link
+                            color = Color(0xFF00796B)
                         )
                     }
                 }
@@ -280,7 +275,7 @@ class LoginActivity : ComponentActivity() {
     private suspend fun loginRequest(username: String, password: String, context: Context) {
         val client = HttpClient(CIO)
         try {
-            val response: HttpResponse = client.get("http://192.168.254.104/MaluPET/REST/login.php") {
+            val response: HttpResponse = client.get("http://192.168.254.104/MaluPET/REST/login_account.php") {
                 url {
                     parameters.append("username", username)
                     parameters.append("password", password)
@@ -290,8 +285,8 @@ class LoginActivity : ComponentActivity() {
             val body = response.body<String>()
             if ("success" in body.lowercase()) {
                 context.toast("Login successful!")
-                // TODO: Navigate to home screen
-                // For example: context.startActivity(Intent(context, HomeScreenActivity::class.java))
+                context.startActivity(Intent(context, HomePageActivity::class.java))
+                (context as? ComponentActivity)?.finish()
             } else {
                 context.toast("Invalid credentials.")
             }
