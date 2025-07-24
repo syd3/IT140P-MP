@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">MaluPET</string>
+    <string name="add_pet">➕ Add Pet Profile</string>
+    <string name="manage_schedules">📅 Manage Schedules</string>
+    <string name="save">💾 Save</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_species">Species</string>
+    <string name="hint_breed">Breed</string>
+    <string name="hint_age">Age</string>
+    <string name="hint_gender">Gender</string>
+</resources>
